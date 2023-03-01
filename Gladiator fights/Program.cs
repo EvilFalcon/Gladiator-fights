@@ -58,14 +58,14 @@ namespace Gladiator_fights
             {
                 Console.Write("ПОБЕДИЛ :\n\n");
                 _redFighter.ShowHealthInfo();
-                Console.WriteLine($"\n\n\nПРОИГРАЛ :");
+                Console.WriteLine($"\n\n\nПРОИГРАЛ :\n\n");
                 _greenFighter.ShowHealthInfo();
             }
             else
             {
                 Console.Write("ПОБЕДИЛ :\n\n");
                 _greenFighter.ShowHealthInfo();
-                Console.Write($"\n\nПРОИГРАЛ :");
+                Console.Write($"\n\n\nПРОИГРАЛ :\n\n");
                 _redFighter.ShowHealthInfo();
             }
 
@@ -175,9 +175,11 @@ namespace Gladiator_fights
             {
                 heIsAliveHero = "живой";
             }
-
+            string text =$"|{Name,26}|{Health,-8}/{FullHealth,5}|{SpellPoints,-5}/{MaxSpellPoints,4}|{ArmorPercent,11}%|{Damage,11}|{heIsAliveHero,12}|";
+            Console.WriteLine(new string('_', text.Length));
             Console.WriteLine("|Класс героя и его команда |Здоровье героя|Очки магии|Защита героя|атака героя|Статус героя|");
-            Console.WriteLine($"|{Name,26}|{Health,-8}/{FullHealth,5}|{SpellPoints,-5}/{MaxSpellPoints,4}|{ArmorPercent,11}%|{Damage,11}|{heIsAliveHero,12}|");
+            Console.WriteLine(text);
+            Console.WriteLine(new string('─', text.Length));
         }
     }
 
