@@ -202,7 +202,7 @@ namespace Gladiator_fights
 
         public override void Attack(Hero enemy)
         {
-            if(RandomProbability.Next(MaxPercent + 1) < chanceOfTreatment)
+            if(RandomProbability.Next(MaxPercent + 1) < _chanceOfTreatment)
             {
                 base.RestoreSpellPoint();
             }
