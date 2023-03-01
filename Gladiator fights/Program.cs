@@ -175,6 +175,7 @@ namespace Gladiator_fights
             {
                 heIsAliveHero = "живой";
             }
+
             string text =$"|{Name,26}|{Health,-8}/{FullHealth,5}|{SpellPoints,-5}/{MaxSpellPoints,4}|{ArmorPercent,11}%|{Damage,11}|{heIsAliveHero,12}|";
             Console.WriteLine(new string('_', text.Length));
             Console.WriteLine("|Класс героя и его команда |Здоровье героя|Очки магии|Защита героя|атака героя|Статус героя|");
