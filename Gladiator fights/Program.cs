@@ -186,7 +186,7 @@ namespace Gladiator_fights
 
     class Cleric : Hero
     {
-        private int chanceOfTreatment = 30;
+        private int _chanceOfTreatment = 30;
         private int _chanceOfRegeneration = 20;
 
         public Cleric(string name, int damage, int health, int armor, int spellPoints)
