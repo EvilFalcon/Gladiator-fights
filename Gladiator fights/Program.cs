@@ -1,55 +1,173 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Gladiator_fights
 {
     internal class Program
     {
-        static void Main(string[] args)
+
+        static void Main()
         {
+            Console.Title = "Might and magic 6 : Mandate of heaven";
+
+            Arena arena = new Arena();
+            arena.Open();
         }
     }
 
-    abstract class Gladiator
+    class Arena
     {
-        protected int _damageHero;
-        protected int _healthHero;
-        protected int _fullHealthHealth;
-        protected float _armorHero;
-        protected bool _heIsAliveHero = true;
+        private Hero _redFighter;
+        private Hero _greenFighter;
 
-        //public int Damage => _damage;
-
-        public void TakeDamage(Gladiator gladiator)
+        public void Open()
         {
-            gladiator._healthHero -= (int)(_damageHero * _armorHero);
+            _redFighter = CreateFighter("Red_Fighter");
+            _greenFighter = CreateFighter("Green_Fighter");
 
-            if(gladiator._healthHero <= 0)
+            Fight();
+            AnnounceWinner();
+        }
+
+        private void Fight()
+        {
+            int millisecondsTimeout = 500;
+            Console.Clear();
+
+            while(_redFighter.IsAlive == true && _greenFighter.IsAlive == true)
             {
-                _heIsAliveHero = false;               
+                _redFighter.ShowHealthInfo();
+                _greenFighter.ShowHealthInfo();
+
+                _redFighter.Attack(_greenFighter);
+
+                _greenFighter.Attack(_redFighter);
+
+                Thread.Sleep(millisecondsTimeout);
+                Console.Clear();
             }
         }
 
-        public void GiveDamage()
+        private void AnnounceWinner()
         {
+            if(_redFighter.IsAlive == false && _greenFighter.IsAlive == false)
+            {
+                Console.WriteLine("Ничья");
+            }
+            else if(_redFighter.IsAlive == true)
+            {
+                Console.Write("ПОБЕДИЛ :");
+                _redFighter.ShowHealthInfo();
+                Console.WriteLine($"\n\n\nПРОИГРАЛ :");
+                _greenFighter.ShowHealthInfo();
+            }
+            else
+            {
+                Console.Write("ПОБЕДИЛ :");
+                _greenFighter.ShowHealthInfo();
+                Console.WriteLine($"\n\n\nПРОИГРАЛ :");
+                _redFighter.ShowHealthInfo();
+            }
 
+            Console.ReadKey();
         }
 
-        protected int SetParameters(int minValue, int maxValue)
+        private Hero CreateFighter(string name)
         {
-            Random randomValue = new Random();
+            const string CommandSelectCleric = "1";
+            const string CommandSelectKnight = "2";
+            const string CommandSelectPaladin = "3";
+            const string CommandSelectArcher = "4";
+            const string CommandSelectSorcerer = "5";
 
-            return randomValue.Next(minValue, maxValue);
+            Console.WriteLine($"{CommandSelectCleric} : Выбрать героя Cleric");
+            Console.WriteLine($"{CommandSelectKnight} : Выбрать героя Knight");
+            Console.WriteLine($"{CommandSelectPaladin} : Выбрать героя Paladin");
+            Console.WriteLine($"{CommandSelectArcher} : Выбрать героя Archer");
+            Console.WriteLine($"{CommandSelectSorcerer} : Выбрать героя Sorcerer");
+
+            switch(Console.ReadLine())
+            {
+                case CommandSelectCleric:
+                return new Cleric(name, 9, 70, 45, 100);
+
+                case CommandSelectKnight:
+                return new Knight(name, 13, 120, 60);
+
+                default:
+                case CommandSelectPaladin:
+                return new Paladin(name, 9, 100, 65);
+
+                case CommandSelectArcher:
+                return new Archer(name, 9, 100, 50);
+
+                case CommandSelectSorcerer:
+                return new Sorcerer(name, 9, 70, 45, 100);
+            }
+        }
+    }
+
+    abstract class Hero
+    {
+        protected static Random RandomProbability = new Random();
+
+        protected int MaxPercent = 100;
+
+        protected int SpellPoints = 0;
+        protected int MaxSpellPoints = 0;
+        protected string Name;
+        protected int Damage;
+        protected int BonusAttack = 2;
+        protected int Health;
+        protected int FullHealth;
+        protected int ArmorPercent;
+        protected int RegenerationSpellPoints = 10;
+
+        public bool IsAlive => Health > 0;
+
+        public virtual void TakeDamage(int damage)
+        {
+            Health -= (damage * (MaxPercent - ArmorPercent)) / MaxPercent;
         }
 
-        public void ShowHeroHealthInfo(Gladiator gladiator)
+        public virtual void Attack(Hero enemy)
+        {
+            enemy.TakeDamage(Damage);
+        }
+
+        public virtual void RestoreSpellPoint()
+        {
+            if(SpellPoints < MaxSpellPoints)
+            {
+                SpellPoints += RegenerationSpellPoints;
+            }
+
+            if(SpellPoints > MaxSpellPoints)
+            {
+                SpellPoints = MaxSpellPoints;
+            }
+        }
+
+        public virtual void RestoreHealthPoints(int regenerationHealth)
+        {
+            int newDamage = Damage * regenerationHealth;
+
+            if(Health > FullHealth)
+            {
+                Health += newDamage;
+            }
+
+            if(Health > FullHealth)
+            {
+                Health = FullHealth;
+            }
+        }
+
+        public void ShowHealthInfo()
         {
             string heIsAliveHero = "";
 
-            if(gladiator._heIsAliveHero == false)
+            if(IsAlive == false)
             {
                 heIsAliveHero = "умер";
             }
@@ -58,71 +176,182 @@ namespace Gladiator_fights
                 heIsAliveHero = "живой";
             }
 
-            Console.WriteLine("Здоровье героя|Защита героя|атака героя|Статус героя|");
-            Console.WriteLine($"{_fullHealthHealth}{_healthHero}|{_armorHero * 100}|{_damageHero}|{heIsAliveHero}");
+            Console.WriteLine("Класс героя и его команда |Здоровье героя|Очки магии|Защита героя|атака героя|Статус героя|");
+            Console.WriteLine($"{Name}|{Health}/{FullHealth}|{SpellPoints}/{MaxSpellPoints}|{ArmorPercent}%|{Damage}|{heIsAliveHero}|");
         }
     }
 
-    class Cleric : Gladiator
+    class Cleric : Hero
     {
+        private int chanceOfTreatment = 30;
+        private int _chanceOfRegeneration = 20;
 
-        private string _name = "Cleric";
-        private int _magicPoints = 100;
-        private int _maxDamage = 20;
-        private int _minDamage = 10;
-        private int _maxHealth = 100;
-        private int _minHealth = 70;
-        private float _armor = 0.6f;
-
-        public Cleric(string name)
+        public Cleric(string name, int damage, int health, int armor, int spellPoints)
         {
-            _name += $"--{name}";
-            _damageHero = SetParameters(_minDamage, _maxDamage);
-            _healthHero = SetParameters(_maxHealth, _minHealth);
-            _armorHero = _armor;
-            _fullHealthHealth = _healthHero;
+            Name = "Cleric---[" + name + "]";
+            Damage = damage;
+            Health = health;
+            ArmorPercent = armor;
+            FullHealth = Health;
+            SpellPoints = spellPoints;
+            MaxSpellPoints = SpellPoints;
+        }
 
+        public override void Attack(Hero enemy)
+        {
+            if(RandomProbability.Next(MaxPercent + 1) < chanceOfTreatment)
+            {
+                base.RestoreSpellPoint();
+            }
+
+            if(RandomProbability.Next(MaxPercent + 1) < _chanceOfRegeneration)
+            {
+                CastSpellHealth();
+            }
+
+            base.Attack(enemy);
+        }
+
+        private void CastSpellHealth()
+        {
+            int spellHealth = 30;
+            int priceSpellPoints = 30;
+
+            if(Health + spellHealth <= FullHealth && SpellPoints >= priceSpellPoints)
+            {
+                Console.WriteLine($"{Name} : Использовал заклинание лечения");
+
+                Health += spellHealth;
+                SpellPoints -= priceSpellPoints;
+            }
         }
     }
 
-    class Paladin : Gladiator
+    class Knight : Hero
     {
+        private int doubleAttackChance = 30;
 
-        private string _name = "Paladin";
-        private int _magicPoints = 60;
-        private int _maxDamage = 20;
-        private int _minDamage = 10;
-        private int _maxHealth = 150;
-        private int _minHealth = 100;
-        private float _armor = 0.5f;
-
-        public Paladin(string name)
+        public Knight(string name, int damage, int health, int armor)
         {
-            _name += $"--{name}";
-            _damageHero = SetParameters(_minDamage, _maxDamage);
-            _healthHero = SetParameters(_maxHealth, _minHealth);
-            _armorHero = _armor;
-            _fullHealthHealth = _healthHero;
+            Name = "Knight---[" + name + "]";
+            Damage = damage;
+            Health = health;
+            ArmorPercent = armor;
+            FullHealth = Health;
+        }
+
+        public override void Attack(Hero enemy)
+        {
+            if(RandomProbability.Next(MaxPercent + 1) < doubleAttackChance)
+            {
+                enemy.TakeDamage(Damage * BonusAttack);
+            }
+            else
+            {
+                base.Attack(enemy);
+            }
         }
     }
 
-    class Warrior : Gladiator
+    class Paladin : Hero
     {
-        private string _name = "Warrior";
-        private int _maxDamage = 30;
-        private int _minDamage = 20;
-        private int _maxHealth = 250;
-        private int _minHealth = 130;
-        private float _armor = 0.4f;
+        private int blockChance = 30;
 
-        public Warrior(string name)
+        public Paladin(string name, int heroDamage, int healthHero, int armor)
         {
-            _name += $"--{name}";
-            _damageHero = SetParameters(_minDamage, _maxDamage);
-            _healthHero = SetParameters(_maxHealth, _minHealth);
-            _armorHero = _armor;
-            _fullHealthHealth = _healthHero;
+            Name = "Paladin---[" + name + "]";
+            Damage = heroDamage;
+            Health = healthHero;
+            ArmorPercent = armor;
+            FullHealth = Health;
         }
 
+        public override void TakeDamage(int damage)
+        {
+            if(RandomProbability.Next(MaxPercent + 1) > blockChance)
+            {
+                base.TakeDamage(damage);
+            }
+        }
+    }
+
+    class Archer : Hero
+    {
+        private int _regenerationHealth = 2;
+        private int _healthRegenerationChance = 25;
+        private int _blessingChance = 70;
+        private int _bonusDamageSpecialAbility = 2;
+        private bool _isAbilityWorks = false;
+
+        public Archer(string name, int heroDamage, int healthHero, int armor)
+        {
+            Name = "Archer---[" + name + "]";
+            Damage = heroDamage;
+            Health = healthHero;
+            ArmorPercent = armor;
+            FullHealth = Health;
+        }
+
+        public override void Attack(Hero enemy)
+        {
+            if(RandomProbability.Next(MaxPercent) < _blessingChance && _isAbilityWorks == false)
+            {
+                UseSpecialAbility();
+                _isAbilityWorks = true;
+            }
+
+            if(RandomProbability.Next(MaxPercent) < _healthRegenerationChance)
+            {
+                base.RestoreHealthPoints(_regenerationHealth);
+            }
+
+            base.Attack(enemy);
+        }
+
+        public void UseSpecialAbility()
+        {
+            Damage *= _bonusDamageSpecialAbility;
+        }
+    }
+
+    class Sorcerer : Hero
+    {
+        private int _spellPoints;
+        private int _maxSpellPoints;
+        private int _regenerationSpellPoints = 10;
+        private int _chanceOfRegeneration = 20;
+        private int _magicDamage = 10;
+        private int _fireballCost = 15;
+
+        public Sorcerer(string name, int heroDamage, int healthHero, int armor, int spellPoints)
+        {
+            Name = "Sorcerer---[" + name + "]";
+            Damage = heroDamage;
+            Health = healthHero;
+            ArmorPercent = armor;
+            FullHealth = Health;
+            _spellPoints = spellPoints;
+            _maxSpellPoints = _spellPoints;
+        }
+
+        public override void Attack(Hero enemy)
+        {
+            if(RandomProbability.Next(MaxPercent) < _chanceOfRegeneration)
+            {
+                RestoreSpellPoint();
+            }
+
+            FireballCast(enemy);
+        }
+
+        private void FireballCast(Hero enemy)
+        {
+            if(_fireballCost < _spellPoints)
+            {
+                enemy.TakeDamage(Damage + _magicDamage);
+            }
+        }
     }
 }
+
+
