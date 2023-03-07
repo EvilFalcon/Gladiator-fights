@@ -5,7 +5,6 @@ namespace Gladiator_fights
 {
     internal class Program
     {
-
         static void Main()
         {
             Console.Title = "Might and magic 6 : Mandate of heaven";
@@ -366,7 +365,6 @@ namespace Gladiator_fights
             }
         }
     }
-
 }
 
 
