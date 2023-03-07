@@ -231,7 +231,7 @@ namespace Gladiator_fights
 
     class Knight : Hero
     {
-        private int doubleAttackChance = 30;
+        private int _doubleAttackChance = 30;
 
         public Knight(string name, int damage, int health, int armor)
         {
@@ -244,7 +244,7 @@ namespace Gladiator_fights
 
         public override void Attack(Hero enemy)
         {
-            if(RandomProbability.Next(MaxPercent + 1) < doubleAttackChance)
+            if(RandomProbability.Next(MaxPercent + 1) < _doubleAttackChance)
             {
                 enemy.TakeDamage(Damage * BonusAttack);
             }
@@ -257,7 +257,7 @@ namespace Gladiator_fights
 
     class Paladin : Hero
     {
-        private int blockChance = 30;
+        private int _blockChance = 30;
 
         public Paladin(string name, int heroDamage, int healthHero, int armor)
         {
@@ -270,7 +270,7 @@ namespace Gladiator_fights
 
         public override void TakeDamage(int damage)
         {
-            if(RandomProbability.Next(MaxPercent + 1) > blockChance)
+            if(RandomProbability.Next(MaxPercent + 1) > _blockChance)
             {
                 base.TakeDamage(damage);
             }
@@ -350,6 +350,19 @@ namespace Gladiator_fights
             if(_fireballCost < _spellPoints)
             {
                 enemy.TakeDamage(Damage + _magicDamage);
+            }
+        }
+
+        public override void RestoreSpellPoint()
+        {
+            if(SpellPoints < MaxSpellPoints)
+            {
+                SpellPoints += _regenerationSpellPoints;
+            }
+
+            if(SpellPoints > MaxSpellPoints)
+            {
+                SpellPoints = MaxSpellPoints;
             }
         }
     }
