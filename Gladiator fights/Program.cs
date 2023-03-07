@@ -319,7 +319,6 @@ namespace Gladiator_fights
     class Sorcerer : Hero
     {
         private int _spellPoints;
-        private int _maxSpellPoints;
         private int _regenerationSpellPoints = 10;
         private int _chanceOfRegeneration = 20;
         private int _magicDamage = 10;
@@ -333,7 +332,7 @@ namespace Gladiator_fights
             ArmorPercent = armor;
             FullHealth = Health;
             _spellPoints = spellPoints;
-            _maxSpellPoints = _spellPoints;
+            MaxSpellPoints = _spellPoints;
         }
 
         public override void Attack(Hero enemy)
@@ -342,7 +341,7 @@ namespace Gladiator_fights
             {
                 RestoreSpellPoint();
             }
-
+            
             FireballCast(enemy);
         }
 
