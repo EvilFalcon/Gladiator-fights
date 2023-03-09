@@ -24,7 +24,7 @@ namespace Gladiator_fights
             _greenFighter = CreateFighter("Green_Fighter");
 
             Fight();
-            AnnounceWinner();
+            DefineWinner();
         }
 
         private void Fight()
@@ -46,7 +46,7 @@ namespace Gladiator_fights
             }
         }
 
-        private void AnnounceWinner()
+        private void DefineWinner()
         {
             if(_redFighter.IsAlive == false && _greenFighter.IsAlive == false)
             {
@@ -125,7 +125,7 @@ namespace Gladiator_fights
 
         public virtual void TakeDamage(int damage)
         {
-            Health -= (damage * (MaxPercent - ArmorPercent)) / MaxPercent;
+            Health -= damage * (MaxPercent - ArmorPercent) / MaxPercent;
         }
 
         public virtual void Attack(Hero enemy)
@@ -163,18 +163,18 @@ namespace Gladiator_fights
 
         public void ShowHealthInfo()
         {
-            string heIsAliveHero = "";
+            string aliveStatus = "";
 
             if(IsAlive == false)
             {
-                heIsAliveHero = "умер";
+                aliveStatus = "умер";
             }
             else
             {
-                heIsAliveHero = "живой";
+                aliveStatus = "живой";
             }
 
-            string text = $"|{Name,26}|{Health,-8}/{FullHealth,5}|{SpellPoints,-5}/{MaxSpellPoints,4}|{ArmorPercent,11}%|{Damage,11}|{heIsAliveHero,12}|";
+            string text = $"|{Name,26}|{Health,-8}/{FullHealth,5}|{SpellPoints,-5}/{MaxSpellPoints,4}|{ArmorPercent,11}%|{Damage,11}|{aliveStatus,12}|";
             Console.WriteLine(new string('_', text.Length));
             Console.WriteLine("|Класс героя и его команда |Здоровье героя|Очки магии|Защита героя|атака героя|Статус героя|");
             Console.WriteLine(text);
@@ -341,10 +341,10 @@ namespace Gladiator_fights
                 RestoreSpellPoint();
             }
             
-            FireballCast(enemy);
+            CastFireball(enemy);
         }
 
-        private void FireballCast(Hero enemy)
+        private void CastFireball(Hero enemy)
         {
             if(_fireballCost < _spellPoints)
             {
