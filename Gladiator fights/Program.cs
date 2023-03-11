@@ -32,7 +32,7 @@ namespace Gladiator_fights
             int millisecondsTimeout = 500;
             Console.Clear();
 
-            while(_redFighter.IsAlive == true && _greenFighter.IsAlive == true)
+            while(_redFighter.IsAlive  && _greenFighter.IsAlive )
             {
                 _redFighter.ShowHealthInfo();
                 _greenFighter.ShowHealthInfo();
@@ -52,7 +52,7 @@ namespace Gladiator_fights
             {
                 Console.WriteLine("Ничья");
             }
-            else if(_redFighter.IsAlive == true)
+            else if(_redFighter.IsAlive)
             {
                 Console.Write("ПОБЕДИЛ :\n\n");
                 _redFighter.ShowHealthInfo();
@@ -111,8 +111,8 @@ namespace Gladiator_fights
 
         protected int MaxPercent = 100;
 
-        protected int SpellPoints = 0;
-        protected int MaxSpellPoints = 0;
+        protected int SpellPoints;
+        protected int MaxSpellPoints;
         protected string Name;
         protected int Damage;
         protected int BonusAttack = 2;
@@ -163,7 +163,7 @@ namespace Gladiator_fights
 
         public void ShowHealthInfo()
         {
-            string aliveStatus = "";
+            string aliveStatus;
 
             if(IsAlive == false)
             {
